@@ -4,19 +4,18 @@
 #define MAIN_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include <string.h>
 
-#define kiloBytes(value) (value * 1024LL)
-#define megaBytes(value) (kiloBytes(value) * 1024LL)
-#define gigaBytes(value) (megaBytes(value) * 1024LL)
-#define teraBytes(value) (gigaBtes(value) * 1024LL)
+#define JAI_UTILS_IMPLEMENTATION
+#define VEC3_IMPLEMENTATION
+#define RAY_IMPLEMENTATION
+#define COLOUR_IMPLEMENTATION
 
-#define internal static
-#define global static
-#define localPersist static
-
-#define DEFAULT_STRING_SIZE megaBytes(2)
+#include "utils.h"
+#include "ppm.h"
+#include "vec3.h"
+#include "ray.h"
+#include "colour.h"
 
 #endif //MAIN_H
 

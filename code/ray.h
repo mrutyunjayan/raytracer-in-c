@@ -5,20 +5,31 @@
 
 #include "vec3.h"
 
-#define Point3 Vec3
+typedef Vec3f Point3f;
 
-typedef struct {
-    Point3 origin;
-    Vec3 direction;
+typedef struct Ray {
+    Point3f origin;
+    Vec3f direction;
 } Ray;
 
-inline Point3 RayAtT(Ray* ray,
-                     real32 t) {
-    Vec3 scaledVec = vec3ScaleUp ((const Vec3*)(&ray->direction),
-                                  t);
-    return (Point3)(vec3Add((const Vec3*)(&ray->origin),
-                            (const Vec3*)&scaledVec));
-}
-
+Point3f
+RayAtT(Ray* ray,
+       f32 t);
 
 #endif //RAY_H
+
+//~
+
+#if defined (RAY_IMPLEMENTATION)
+
+Point3f
+RayAtT(Ray* ray,
+       f32 t) {
+    Vec3f scaledVec = vec3f_scaleUp((const Vec3f*)(&ray->direction),
+                                    t);
+    return vec3f_add((const Vec3f*)(&ray->origin),
+                     (const Vec3f*)&scaledVec);
+}
+
+#undef RAY_IMPLEMENTATION
+#endif // IMPLEMENTATION

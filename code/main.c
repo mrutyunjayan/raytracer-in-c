@@ -1,51 +1,34 @@
 #include "main.h"
-#include "outString.h"
-#include "ppm.h"
-#include "vec3.h"
-#include "ray.h"
 
-#define WIDTH 3
-#define HEIGHT 2
-#define MAX_VALUE 255
-#define PPM_TYPE 3
-
-int main(int argc, char** argv) {
-    outString buffer;
-    buffer.data = (char*)malloc(DEFAULT_STRING_SIZE);
-    buffer.allocation = DEFAULT_STRING_SIZE;
+int
+main(int argc, char** argv) {
+    PPM image = ppm_create(PPM_TYPE,
+                           IMAGE_WIDTH,
+                           IMAGE_HEIGHT,
+                           IMAGE_MAX_VALUE);
     
-    ppmInfo* image = ppmCreateInfo(PPM_TYPE,
-                                   WIDTH,
-                                   HEIGHT,
-                                   MAX_VALUE);
-    if (ppmPrint(image,
-                 &buffer) < 0) {
-        printf("ERROR writing to string");
-        return (-1);
+    for (i32 j = IMAGE_HEIGHT; j >= 0; j--) {
+        for (i32 i = 0; i < IMAGE_WIDTH; i++) {
+            f32 rf32 = (f32)(i) / (IMAGE_WIDTH - 1);
+            f32 gf32 = (f32)(j) / (IMAGE_WIDTH - 1);
+            f32 bf32 = 0.25f;
+            
+            Col32 pixelColour = {0};
+            pixelColour.r = (u8)(255.999f * rf32);
+            pixelColour.g = (u8)(255.999f * gf32);
+            pixelColour.b = (u8)(255.999f * bf32);
+            
+            ppm_write(&image, pixelColour);
+        }
     }
     
-    Ray test;
     
-    test.origin.x = 0.0;
-    test.origin.y = 0.0;
-    test.origin.z = 0.0;
-    test.direction.x = 1.0;
-    test.direction.y = 1.0;
-    test.direction.z = 1.0;
+    FILE* file = fopen("image.ppm","w");
+    fprintf(file,"%s", (char*)image.data);
     
-    printf("Memory occuppied by Ray: %d\n",
-           sizeof(test));
-    printf("Ray Origin: %d\nRay Direction: %d\n",
-           test.origin.x,
-           test.direction.x);
-    
-    FILE* fileHandle = fopen("image.ppm",
-                             "w");
-    fprintf(fileHandle,
-            "%s", buffer.data);
     //FREE
-    free(buffer.data);
-    ppmDeleteInfo(image);
+    ppm_free(&image);
+    fclose(file);
     
     return (0);
 }

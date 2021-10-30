@@ -27,17 +27,11 @@ command_list = {
    .cmd = { { "build.bat" , .os = "win"   },
             { "./build.sh", .os = "linux" },
             { "./build.sh", .os = "mac"   }, }, },
- { .name = "run",
-   .out = "*run*", .footer_panel = false, .save_dirty_files = false,
-   .cmd = { { "build\\raytracer", .os = "win"   },
-            { "build/raytracer" , .os = "linux" },
-            { "build/raytracer" , .os = "mac"   }, }, },
 { .name = "debug",
-   .out = "*DEBUG*", .footer_panel = false, .save_dirty_files = false,
-   .cmd = { { "debug.bat", .os = "win"   },
+   .save_dirty_files = false,
+   .cmd = { { "remedybg build/ray.rdbg", .os = "win"   },
             { "./build/raytracer" , .os = "linux" },
             { "./build/raytracer" , .os = "mac"   }, }, },
 };
 fkey_command[1] = "build";
-fkey_command[2] = "run";
-fkey_command[3] = "debug";
+fkey_command[5] = "debug";

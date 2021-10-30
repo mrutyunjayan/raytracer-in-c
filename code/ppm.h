@@ -3,66 +3,84 @@
 #ifndef PPM_H
 #define PPM_H
 
-#include <string.h>
+#include "colour.h"
 
-#define numOfElements(a)                                                       \
-{ (sizeof(a) / sizeof(a[0])) }
-// size of array / size of each element in the array}
-//   bytes       /          bytes
+#define IMAGE_WIDTH 300
+#define IMAGE_HEIGHT 200
+#define IMAGE_MAX_VALUE 255
+#define PPM_TYPE 3
+#define DEFAULT_PPM_SIZE MB(10)
 
-global int testArray[] ={
+global i32
+testArray[] = {
     255, 0, 0,  // red
     0, 255, 0, // green
     0, 0, 255,  // blue
     255, 255, 0,  // yellow
     255, 255, 255,  // white
-    0, 0, 0};  // black
+    0, 0, 0  // black
+};
 
-typedef struct {
-    uint8_t type;
-    uint16_t width;
-    uint16_t height;
-    uint16_t maxValue;
-} ppmInfo;
+typedef struct PPM {
+    u8 type;
+    u16 width;
+    u16 height;
+    u16 maxValue;
+    void* data;
+    u32 allocation;
+    memoryIndex allocationUsed;
+} PPM;
 
-ppmInfo* ppmCreateInfo(uint8_t type,
-                       uint16_t width,
-                       uint16_t height,
-                       uint16_t maxValue) {
-    ppmInfo* newPpmInfo = (ppmInfo*)malloc(sizeof(ppmInfo));
+internal PPM
+ppm_create(u8 type,
+           u16 width,
+           u16 height,
+           u16 maxValue) {
+    PPM result = {
+        .type = type,
+        .width = width,
+        .height = height,
+        .maxValue = maxValue,
+        .data = (char*)malloc(DEFAULT_PPM_SIZE),
+        .allocation = DEFAULT_PPM_SIZE
+    };
+    char* charData = (char*)result.data;
+    sprintf(result.data,
+            "P%d\n%d %d\n%d\n",
+            result.type, result.width, result.height,result.maxValue);
+    memoryIndex counter = 0;
     
-    newPpmInfo->type = type;
-    newPpmInfo->width = width;
-    newPpmInfo->height = height;
-    newPpmInfo->maxValue = maxValue;
-    
-    return (newPpmInfo);
-}
-
-void ppmDeleteInfo(ppmInfo* ppm) {
-    free(ppm);
-}
-
-int ppmPrint(ppmInfo* ppm,
-             outString* buffer) {
-    uint16_t errorCode = 0;
-    errorCode = sprintf(buffer->data,
-                        "P%d\n%d %d\n%d\n",
-                        ppm->type, ppm->width, ppm->height,ppm->maxValue);
-    outStringUpdateLength(buffer);
-    
-    int i = 0;
-    int arraySize = numOfElements(testArray);
-    while (errorCode >= 0 && i < arraySize) {
-        errorCode = sprintf(buffer->data + buffer->length,
-                            "%d %d %d\n",
-                            testArray[i], testArray[i + 1], testArray[i + 2]);
-        i = i + 3;
-        outStringUpdateLength(buffer);
+    while (charData[counter] != '\0') {
+        counter++;
     }
+    result.allocationUsed = counter;
+    
+    return (result);
+}
+
+internal void
+ppm_free(PPM* ppm) {
+    ppm->allocation = 0;
+    ppm->allocationUsed = 0;
+    free(ppm->data);
+}
+
+internal i32
+ppm_write(PPM* ppm, Col32 pixelColour) {
+    char* charData = (char*)ppm->data;
+    i32 errorCode = 0;
+    
+    errorCode = sprintf(charData + ppm->allocationUsed,
+                        "%d %d %d\n",
+                        pixelColour.r, pixelColour.g, pixelColour.b);
+    
+    memoryIndex counter = ppm->allocationUsed;
+    while (charData[counter] != '\0') {
+        counter++;
+    }
+    ppm->allocationUsed = counter;
+    
     return (errorCode);
 }
-
-
 
 #endif //PPM_H
